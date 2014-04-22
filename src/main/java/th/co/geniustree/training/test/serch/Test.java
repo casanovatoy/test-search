@@ -36,17 +36,18 @@ public class Test extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String data = getInitParameter("name");
+        String data = request.getParameter("name");
         List<Data> mydto = new ArrayList<Data>();
         try (PrintWriter out = response.getWriter(); Connection connection = datasource.getConnection()) {
             Statement sm = connection.createStatement();
-            ResultSet resultset = sm.executeQuery("SELECT * FROM DO_ITEM WHERE DRUGCODE LIKE \'" + data + "%\'");
+            ResultSet resultset = sm.executeQuery("SELECT * FROM DO_ITEM WHERE ID LIKE \'"+ data +"%\'");
             while (resultset.next()) {
                 Data dto = new Data();
                 dto.setId(resultset.getString("ID"));
-                dto.setDrugcode(resultset.getString("DRUDCODE"));
+                dto.setDrugcode(resultset.getString("DRUGCODE"));
                 mydto.add(dto);
             }
+            request.setAttribute("mydto", mydto);
             request.getRequestDispatcher("newjsp.jsp").forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
